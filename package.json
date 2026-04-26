@@ -1,0 +1,30 @@
+{
+  "name": "mcp-claude-real-routing-test",
+  "version": "3.0.0",
+  "type": "module",
+  "description": "Real Claude Code MCP routing experiment: direct tools vs semantic router vs hybrid, with MCP server logs from actual Claude Code sessions.",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist runs/*",
+    "server:direct": "node dist/servers/direct-tools-server.js",
+    "server:router": "node dist/servers/semantic-router-server.js",
+    "server:hybrid": "node dist/servers/hybrid-server.js",
+    "report": "node dist/lib/report-from-mcp-logs.js",
+    "schema-report": "node dist/lib/schema-token-estimate.js",
+    "claude:bench": "node dist/benchmarks/run-claude-code-benchmark.js",
+    "compare": "node dist/benchmarks/compare-claude-benchmark-summaries.js",
+    "bedrock:bench": "node dist/benchmarks/run-bedrock-mcp-benchmark.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.1037.0",
+    "@aws-sdk/credential-provider-node": "^3.972.36",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "aws4": "^1.13.2",
+    "express": "^5.2.1",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "latest"
+  }
+}

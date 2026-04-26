@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your AI Agent Has Too Many Tools — Here's How to Fix It</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --ink:#1a1a1a;
+  --ink2:#444;
+  --ink3:#767676;
+  --ink4:#9a9a9a;
+  --page:#faf9f7;
+  --white:#ffffff;
+  --line:#e8e5e0;
+  --line2:#d4d0c8;
+  --accent:#c0392b;
+  --accent2:#e74c3c;
+  --teal:#0d7377;
+  --amber:#d68910;
+  --blue:#1a5276;
+  --surface:#f2f0eb;
+  --surface2:#eae7e0;
+  --serif:'Lora',Georgia,serif;
+  --sans:'Source Sans 3',system-ui,sans-serif;
+  --mono:'Fira Code',monospace;
+}
+
+html{scroll-behavior:smooth}
+body{background:var(--page);color:var(--ink);font-family:var(--sans);font-size:18px;line-height:1.8;-webkit-font-smoothing:antialiased}
+
+/* ── TOP BAR ── */
+.topbar{
+  border-bottom:1px solid var(--line);
+  padding:0 40px;height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--white);
+  position:sticky;top:0;z-index:100;
+}
+.pub-name{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-0.02em}
+.topbar-right{display:flex;align-items:center;gap:20px}
+.tag-pill{font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);padding:4px 10px;border-radius:20px}
+
+/* ── HERO ── */
+.hero{
+  max-width:780px;margin:0 auto;
+  padding:72px 32px 56px;
+  border-bottom:1px solid var(--line);
+}
+.hero-kicker{
+  font-family:var(--sans);font-size:13px;font-weight:600;
+  letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:24px;
+  display:flex;align-items:center;gap:8px;
+}
+.hero-kicker::before{content:'';display:block;width:28px;height:2px;background:var(--accent)}
+h1{
+  font-family:var(--serif);font-size:46px;font-weight:600;line-height:1.12;
+  letter-spacing:-0.03em;color:var(--ink);margin-bottom:20px;
+}
+.hero-subtitle{
+  font-family:var(--serif);font-style:italic;font-size:21px;
+  color:var(--ink3);line-height:1.55;margin-bottom:32px;max-width:680px;
+}
+.byline{
+  display:flex;align-items:center;gap:14px;padding-top:24px;border-top:1px solid var(--line);
+}
+.avatar{
+  width:42px;height:42px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--teal));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:14px;font-weight:500;color:#fff;flex-shrink:0;
+}
+.byline-meta{font-size:14px;color:var(--ink3)}
+.byline-meta strong{color:var(--ink);font-weight:500}
+.read-time{font-size:13px;color:var(--ink4);margin-top:1px}
+
+/* ── CONTENT ── */
+.content{max-width:700px;margin:0 auto;padding:56px 32px 0}
+
+p{margin-bottom:1.5rem;color:var(--ink2);font-size:18px;line-height:1.85}
+strong{color:var(--ink);font-weight:600}
+
+h2{
+  font-family:var(--serif);font-size:32px;font-weight:600;
+  letter-spacing:-0.02em;color:var(--ink);
+  margin:3rem 0 1.2rem;line-height:1.25;
+}
+h3{
+  font-family:var(--sans);font-size:16px;font-weight:600;
+  letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--ink3);margin:2.5rem 0 1rem;
+}
+
+/* Drop cap */
+.drop-cap::first-letter{
+  font-family:var(--serif);font-size:72px;font-weight:600;
+  float:left;line-height:0.82;padding-right:10px;padding-top:8px;
+  color:var(--ink);
+}
+
+/* Pull quote */
+.pullquote{
+  border-left:4px solid var(--accent);
+  padding:4px 0 4px 28px;margin:2.5rem 0;
+}
+.pullquote p{
+  font-family:var(--serif);font-style:italic;font-size:22px;
+  color:var(--ink);line-height:1.5;margin:0;
+}
+
+/* Divider */
+.divider{
+  text-align:center;margin:3rem 0;
+  color:var(--ink4);letter-spacing:0.5em;font-size:14px;
+}
+
+/* Code */
+pre{
+  background:var(--ink);color:#d4d0c8;
+  border-radius:8px;padding:22px 24px;
+  font-family:var(--mono);font-size:13px;line-height:1.7;
+  overflow-x:auto;margin:1.5rem 0;
+}
+pre .cm{color:#6b7280}
+pre .kw{color:#f59e0b}
+pre .str{color:#86efac}
+pre .fn{color:#93c5fd}
+pre .num{color:#f9a8d4}
+code{font-family:var(--mono);font-size:14px;background:var(--surface2);color:var(--accent);padding:2px 7px;border-radius:4px}
+
+/* ── USE CASE BOXES ── */
+.usecase{
+  background:var(--white);border:1px solid var(--line);
+  border-radius:12px;padding:28px 32px;margin:2.5rem 0;
+  border-left:4px solid var(--teal);
+}
+.usecase-label{
+  font-family:var(--sans);font-size:11px;font-weight:600;
+  letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.usecase h3{margin:0 0 10px;font-size:17px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--ink)}
+.usecase p{font-size:15px;margin-bottom:10px;color:var(--ink2)}
+.usecase p:last-child{margin-bottom:0}
+.usecase .tool-list{
+  display:flex;flex-wrap:wrap;gap:6px;margin:12px 0;
+}
+.tool-chip{
+  font-family:var(--mono);font-size:11px;
+  background:var(--surface);border:1px solid var(--line2);
+  padding:3px 9px;border-radius:4px;color:var(--ink3);
+}
+
+/* ── ARCHITECTURE DIAGRAM ── */
+.arch-diagram{
+  background:var(--white);border:1px solid var(--line);
+  border-radius:12px;padding:24px;margin:2rem 0;overflow-x:auto;
+}
+.arch-diagram-title{font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink4);margin-bottom:16px}
+.flow{display:flex;align-items:center;gap:0;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+.flow-node{
+  background:var(--surface);border:1px solid var(--line2);
+  border-radius:8px;padding:8px 14px;
+  font-family:var(--mono);font-size:12px;color:var(--ink);
+  white-space:nowrap;text-align:center;flex-shrink:0;
+}
+.flow-node.highlight{background:var(--teal);border-color:var(--teal);color:#fff}
+.flow-node.warn{background:#fef3c7;border-color:#fcd34d;color:#92400e}
+.flow-arrow{color:var(--ink4);font-size:16px;padding:0 6px;flex-shrink:0}
+
+/* ── CHARTS ── */
+.chart-section{margin:3rem 0}
+.chart-header{margin-bottom:20px}
+.chart-header h3{margin:0 0 4px;font-size:15px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--ink)}
+.chart-header p{font-size:14px;color:var(--ink4);margin:0}
+.chart-legend{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink3);font-family:var(--sans)}
+.legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.chart-box{
+  background:var(--white);border:1px solid var(--line);
+  border-radius:12px;padding:24px;
+}
+.chart-wrap{position:relative}
+.chart-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+
+/* ── RESULTS TABLE ── */
+.data-section{margin:3rem 0}
+.data-table-wrap{overflow-x:auto}
+.data-table{
+  width:100%;border-collapse:collapse;
+  font-size:14px;font-family:var(--sans);
+}
+.data-table thead th{
+  background:var(--surface);padding:10px 16px;
+  text-align:left;font-size:11px;font-weight:600;
+  letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);
+  border-bottom:2px solid var(--line2);
+}
+.data-table tbody tr{border-bottom:1px solid var(--line)}
+.data-table tbody tr:hover{background:var(--surface)}
+.data-table tbody td{padding:11px 16px;color:var(--ink2)}
+.data-table td:first-child{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--ink)}
+.pill{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500}
+.pill-ok{background:#d1fae5;color:#065f46}
+.pill-warn{background:#fef3c7;color:#92400e}
+.pill-bad{background:#fee2e2;color:#991b1b}
+.delta-good{color:#065f46;font-family:var(--mono);font-size:12px}
+.delta-bad{color:#991b1b;font-family:var(--mono);font-size:12px}
+.delta-base{color:var(--ink4);font-family:var(--mono);font-size:12px}
+.section-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--teal);background:#ecfdf5;border:1px solid #a7f3d0;
+  padding:4px 12px;border-radius:20px;margin-bottom:16px;
+}
+
+/* ── SUMMARY STAT CARDS ── */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:2rem 0}
+.stat-card{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:18px 20px;text-align:center}
+.stat-card .num{font-family:var(--serif);font-size:36px;font-weight:600;line-height:1;margin-bottom:4px}
+.stat-card .lbl{font-size:13px;color:var(--ink4);line-height:1.4}
+.num-red{color:var(--accent)}
+.num-teal{color:var(--teal)}
+.num-blue{color:var(--blue)}
+
+/* ── RECOMMENDATION ── */
+.rec-box{
+  background:var(--ink);color:#e8e5e0;
+  border-radius:14px;padding:36px 40px;margin:3rem 0;
+}
+.rec-box h2{color:#fff;margin-top:0}
+.rec-box p{color:#b0aaa0;font-size:16px}
+.rec-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:20px}
+.rec-card{
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;padding:18px 20px;
+}
+.rec-card.featured{border-color:rgba(13,115,119,0.5);background:rgba(13,115,119,0.12)}
+.rec-card .mode{font-family:var(--mono);font-size:14px;font-weight:500;margin-bottom:6px}
+.rec-card.featured .mode{color:#34d399}
+.rec-card .mode-desc{font-size:13px;color:#888;line-height:1.55}
+.rec-card .use-label{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#555;margin-top:10px}
+
+/* ── FOOTER ── */
+.article-footer{
+  max-width:700px;margin:56px auto 80px;padding:32px 32px 0;
+  border-top:1px solid var(--line);
+}
+.article-footer p{font-size:14px;color:var(--ink4);line-height:1.7}
+
+@media(max-width:680px){
+  h1{font-size:30px}
+  .hero{padding:40px 20px 32px}
+  .content{padding:40px 20px 0}
+  .chart-grid-2{grid-template-columns:1fr}
+  .stat-row{grid-template-columns:1fr 1fr}
+  .rec-grid{grid-template-columns:1fr}
+  .rec-box{padding:24px 20px}
+  .topbar{padding:0 20px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="pub-name">Engineering · AI Systems</div>
+  <div class="topbar-right">
+    <span class="tag-pill">Deep Dive</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-kicker">Tool Routing · MCP · AI Agents</div>
+  <h1>Your AI Agent Has Too Many Tools — Here's How to Fix It</h1>
+  <p class="hero-subtitle">
+    When you connect an AI agent to a real company system — one with dozens of APIs, microservices, and third-party integrations — exposing every tool directly to the model is a silent performance tax that compounds as you scale.
+  </p>
+  <div class="byline">
+    <div class="avatar">AI</div>
+    <div>
+      <div class="byline-meta"><strong>Engineering Blog</strong> · MCP Architecture Series</div>
+      <div class="read-time">12 min read &nbsp;·&nbsp; Benchmarks included</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+<p class="drop-cap">Picture this. You've just connected your internal AI assistant to your company's systems. The agent can check orders, query billing, inspect infrastructure, pull logs, look up support tickets, and run document searches. Early demos are smooth. Your team is excited. Then the tool catalog grows from 15 to 45 to 100 endpoints — and suddenly the agent slows down, costs more per query, and occasionally calls the wrong tool. Nobody quite understands why.</p>
+
+<p>This is not a model quality problem. It is an architecture problem. And it has a clean solution: <strong>tool routing</strong>.</p>
+
+<div class="pullquote">
+  <p>"The more your system grows, the more valuable tool routing becomes — not just for cost, but for reliability and maintainability."</p>
+</div>
+
+<p>This article walks through the problem, four routing architectures, and benchmark results measured against 20, 60, and 100-tool catalogs using Claude on Amazon Bedrock. Along the way we will ground every concept in two realistic scenarios you are likely building right now.</p>
+
+<div class="divider">· · ·</div>
+
+<!-- USE CASE 1 -->
+<div class="usecase">
+  <div class="usecase-label">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+    Use Case A — Internal Operations Assistant
+  </div>
+  <h3>One agent. Twelve microservices. Hundreds of daily queries.</h3>
+  <p>Your company runs a suite of backend services. An operations team uses an AI assistant to check system health, investigate incidents, look up customer details, and manage support tickets — all from a single chat interface.</p>
+  <p>Behind that interface, the agent needs to reach:</p>
+  <div class="tool-list">
+    <span class="tool-chip">user-service</span>
+    <span class="tool-chip">billing-service</span>
+    <span class="tool-chip">orders-service</span>
+    <span class="tool-chip">inventory-service</span>
+    <span class="tool-chip">notifications-service</span>
+    <span class="tool-chip">analytics-service</span>
+    <span class="tool-chip">search-service</span>
+    <span class="tool-chip">document-service</span>
+    <span class="tool-chip">support-service</span>
+    <span class="tool-chip">deployment-service</span>
+    <span class="tool-chip">monitoring-service</span>
+    <span class="tool-chip">kubernetes-service</span>
+  </div>
+  <p>Each service exposes 4–10 API endpoints. At 12 services that is already 50–120 potential tools — before you add staging environments, versioned APIs, or third-party integrations.</p>
+</div>
+
+<!-- USE CASE 2 -->
+<div class="usecase" style="border-left-color:var(--amber)">
+  <div class="usecase-label" style="color:var(--amber)">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    Use Case B — External API Aggregator
+  </div>
+  <h3>SaaS integrations, payment providers, shipping APIs, and data feeds.</h3>
+  <p>Your platform integrates with external services on behalf of users: Stripe, Shopify, Twilio, SendGrid, GitHub, Jira, Salesforce, various shipping carriers, weather APIs, and financial data providers.</p>
+  <p>Each integration is a cluster of tools. A user asks the agent to <em>"check why the order from yesterday hasn't shipped"</em> — and the agent potentially needs to reach:</p>
+  <div class="tool-list">
+    <span class="tool-chip">stripe:get_payment</span>
+    <span class="tool-chip">shopify:get_order</span>
+    <span class="tool-chip">fedex:track_shipment</span>
+    <span class="tool-chip">sendgrid:get_email_status</span>
+    <span class="tool-chip">jira:get_ticket</span>
+  </div>
+  <p>With dozens of integrations, the agent's tool catalog becomes a menu the size of a restaurant franchise. Without routing, the model wastes context just scanning names it will never use for this query.</p>
+</div>
+
+<h2>The Hidden Tax of Exposing Every Tool Directly</h2>
+
+<p>When you register tools with an MCP server, every tool schema — its name, description, parameter list, and types — gets serialized into the context window on every request. The model reads all of it before choosing one tool to call.</p>
+
+<p>For 10 tools this overhead is negligible. For 100, it's a meaningful fraction of your context budget — paid on every query, whether or not those tools are relevant.</p>
+
+<p>There's a second problem that's harder to see: <strong>semantic collision</strong>. When tools have similar names and overlapping descriptions, the model's selection accuracy drops. Consider these seven health-related endpoints from a real microservice system:</p>
+
+<pre><span class="cm"># All of these exist. Which one handles "is postgres healthy?"</span>
+get_server_health
+get_service_health
+get_api_endpoint_status
+get_database_status
+get_cache_status
+get_cluster_status
+get_node_status</pre>
+
+<p>A user asking <em>"is postgres healthy?"</em> might reasonably map to <code>get_database_status</code> — or to <code>get_service_health</code> — or to <code>get_server_health</code>. As the catalog grows, these collisions multiply. The model picks the most plausible answer from an increasingly noisy schema list.</p>
+
+<div class="divider">· · ·</div>
+
+<h2>Four Architectures, One Benchmark</h2>
+
+<p>We tested four approaches to tool exposure against the same 20 benchmark prompts, across catalogs of 20, 60, and 100 tools. All runs used Claude Sonnet 4 on Amazon Bedrock, via local MCP servers.</p>
+
+<h3>Architecture 1 — Direct</h3>
+
+<div class="arch-diagram">
+  <div class="arch-diagram-title">Flow</div>
+  <div class="flow">
+    <div class="flow-node">User query</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">Claude sees all N tools</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">Selects one</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node highlight">Tool executes</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">Response</div>
+  </div>
+</div>
+
+<p>Simple and transparent. The model sees every schema and picks freely. Works well at small scale. Token usage and selection accuracy both degrade as the catalog grows.</p>
+
+<h3>Architecture 2 — One-call Router</h3>
+
+<div class="arch-diagram">
+  <div class="arch-diagram-title">Flow</div>
+  <div class="flow">
+    <div class="flow-node">User query</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node highlight">tool_router(query)</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">Selects hidden tool</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">Extracts params</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node highlight">Executes</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">Response</div>
+  </div>
+</div>
+
+<p>Claude sees exactly one tool. The routing logic, tool catalog, and parameter extraction all live inside the router. The model's context stays lean regardless of how many internal tools exist. New tools can be added without changing the model-facing interface.</p>
+
+<h3>Architecture 3 — Two-step Router</h3>
+
+<div class="arch-diagram">
+  <div class="arch-diagram-title">Flow</div>
+  <div class="flow">
+    <div class="flow-node">User query</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node highlight">discover_tool(query)</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">tool name + params + confidence</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node highlight">execute_tool(...)</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">Result</div>
+  </div>
+</div>
+
+<p>Discovery and execution are explicit separate calls. This lets you log, inspect, and visualise exactly what the agent decided at each step — ideal for debugging dashboards, compliance audit trails, and developer tooling. Crucially, it is <em>not</em> routing-only: <code>execute_tool</code> runs the selected tool, so it is directly comparable to direct and router in terms of final output.</p>
+
+<h3>Architecture 4 — Hybrid</h3>
+
+<div class="arch-diagram">
+  <div class="arch-diagram-title">Flow</div>
+  <div class="flow">
+    <div class="flow-node">User query</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node warn">Few direct tools + tool_router</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">Direct call OR router</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node highlight">Executes</div>
+  </div>
+</div>
+
+<p>High-frequency tools are exposed directly; everything else goes through a router. Theoretically efficient in practice, the model often chooses the wrong path when the direct-tool set is too broad or semantically overlapping with routed tools.</p>
+
+<div class="divider">· · ·</div>
+
+<h2>Benchmark Results</h2>
+
+<div class="stat-row">
+  <div class="stat-card">
+    <div class="num num-teal">22.8%</div>
+    <div class="lbl">fewer tokens with router vs direct at 100 tools</div>
+  </div>
+  <div class="stat-card">
+    <div class="num num-blue">18.1%</div>
+    <div class="lbl">lower latency with router vs direct at 100 tools</div>
+  </div>
+  <div class="stat-card">
+    <div class="num num-red">0%</div>
+    <div class="lbl">failure rate for direct, router & two-step at any scale</div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="chart-section">
+  <div class="chart-header">
+    <h3>Token usage and latency as the catalog scales</h3>
+    <p>Each bar group represents one catalog size (20 / 60 / 100 tools). Router excluded from execution charts — see note.</p>
+  </div>
+  <div class="chart-legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#1a5276"></span>direct</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#0d7377"></span>two-step</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#c0392b"></span>hybrid</div>
+  </div>
+  <div class="chart-grid-2">
+    <div class="chart-box">
+      <div style="font-size:13px;font-weight:600;color:#767676;margin-bottom:14px;text-transform:uppercase;letter-spacing:0.07em">Avg tokens / query</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="tokChart" role="img" aria-label="Average output tokens per query grouped by catalog size. Hybrid is consistently highest; two-step lowest.">direct 163/166/186, two-step 147/151/146, hybrid 288/272/259</canvas>
+      </div>
+    </div>
+    <div class="chart-box">
+      <div style="font-size:13px;font-weight:600;color:#767676;margin-bottom:14px;text-transform:uppercase;letter-spacing:0.07em">Avg latency / query</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="latChart" role="img" aria-label="Average latency per query in seconds. Hybrid consistently slowest. Direct and two-step close.">direct 3.82/3.95/4.87s, two-step 3.76/4.01/4.64s, hybrid 5.66/5.73/6.13s</canvas>
+      </div>
+    </div>
+  </div>
+  <div class="chart-box">
+    <div style="font-size:13px;font-weight:600;color:#767676;margin-bottom:14px;text-transform:uppercase;letter-spacing:0.07em">Success rate % — including hybrid failures</div>
+    <div class="chart-wrap" style="height:160px">
+      <canvas id="sucChart" role="img" aria-label="Success rate. Direct and two-step maintain 100% at all sizes. Hybrid dropped to 25% in one run at 20 tools.">direct 100% all sizes, two-step 100% all sizes, hybrid 25-90%</canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Tables -->
+<div class="data-section">
+  <div class="section-tag">Raw numbers</div>
+
+  <p style="font-size:14px;color:var(--ink4);margin-bottom:16px">Router data shown separately — it was excluded from head-to-head execution comparisons because it tests tool-finding logic, not end-to-end execution. Full router numbers: 143/139/144 avg tokens · 4.20/4.24/3.98s avg latency · 20/20 success at all sizes.</p>
+
+  <div style="margin-bottom:8px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink4)">20 tools</div>
+  <div class="data-table-wrap" style="margin-bottom:28px">
+    <table class="data-table">
+      <thead><tr><th>Architecture</th><th>Success</th><th>Avg tokens</th><th>Avg latency</th><th>vs direct</th></tr></thead>
+      <tbody>
+        <tr><td>direct</td>  <td><span class="pill pill-ok">20/20</span></td><td>163</td><td>3.82s</td><td class="delta-base">baseline</td></tr>
+        <tr><td>two-step</td><td><span class="pill pill-ok">20/20</span></td><td>147</td><td>3.76s</td><td class="delta-good">−9.8% tok</td></tr>
+        <tr><td>hybrid</td>  <td><span class="pill pill-bad">5/20</span></td> <td>288</td><td>5.66s</td><td class="delta-bad">+76.7% tok · +48% time</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-bottom:8px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink4)">60 tools</div>
+  <div class="data-table-wrap" style="margin-bottom:28px">
+    <table class="data-table">
+      <thead><tr><th>Architecture</th><th>Success</th><th>Avg tokens</th><th>Avg latency</th><th>vs direct</th></tr></thead>
+      <tbody>
+        <tr><td>direct</td>  <td><span class="pill pill-ok">20/20</span></td><td>166</td><td>3.95s</td><td class="delta-base">baseline</td></tr>
+        <tr><td>two-step</td><td><span class="pill pill-ok">20/20</span></td><td>151</td><td>4.01s</td><td class="delta-good">−9.3% tok</td></tr>
+        <tr><td>hybrid</td>  <td><span class="pill pill-warn">14/20</span></td><td>272</td><td>5.73s</td><td class="delta-bad">+63.9% tok · +45% time</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-bottom:8px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink4)">100 tools</div>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Architecture</th><th>Success</th><th>Avg tokens</th><th>Avg latency</th><th>vs direct</th></tr></thead>
+      <tbody>
+        <tr><td>direct</td>  <td><span class="pill pill-ok">20/20</span></td><td>186</td><td>4.87s</td><td class="delta-base">baseline</td></tr>
+        <tr><td>two-step</td><td><span class="pill pill-ok">20/20</span></td><td>146</td><td>4.64s</td><td class="delta-good">−21.5% tok · −4.7% time</td></tr>
+        <tr><td>hybrid</td>  <td><span class="pill pill-warn">18/20</span></td><td>259</td><td>6.13s</td><td class="delta-bad">+39.2% tok · +25.9% time</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="divider">· · ·</div>
+
+<h2>What the Numbers Actually Mean</h2>
+
+<h3>Finding 1 — Direct is a great starting point, not a destination</h3>
+<p>At 20 tools, direct mode is competitive with everything else. There is no meaningful reason to add routing complexity for a small, stable catalog. But notice what happens to direct between 20 and 100 tools: average tokens per query rise from 163 to 186 — a quiet 14% overhead from tool schemas alone, before the model has done any reasoning. That number will keep growing as you add tools.</p>
+
+<h3>Finding 2 — The router is your production interface</h3>
+<p>The one-call router is the most cost-effective architecture at scale. At 100 tools it delivered 20/20 success, 22.8% lower token usage, and 18.1% lower latency versus direct. More importantly, it keeps the <em>model-facing interface stable</em>. When your orders team adds a new endpoint, or your billing team renames a parameter, the router absorbs the change. Claude never knows the difference.</p>
+
+<p>This matters enormously for the external API aggregator scenario. Every time you add a new integration — a new shipping carrier, a new payment gateway — you add tools to the router's internal registry, not to the model's context. The agent interface stays clean.</p>
+
+<h3>Finding 3 — Two-step is your debug interface</h3>
+<p>Two-step keeps full 20/20 success and uses 21.5% fewer tokens than direct at 100 tools — so it is not a performance sacrifice. What it adds is transparency. Between <code>discover_tool</code> and <code>execute_tool</code> you have a natural inspection point: which tool did the router pick, what parameters did it extract, and how confident was it?</p>
+
+<p>For the internal operations assistant scenario, this is your incident debugging interface. When the agent gives a wrong answer, two-step logs tell you exactly where the decision chain broke — at routing or at execution.</p>
+
+<h3>Finding 4 — Hybrid will hurt you if you do it carelessly</h3>
+<p>Hybrid had the worst story across both success rate and token cost. At 20 tools in one run it succeeded only 5 out of 20 times. The failure pattern was consistent: broad, general tools exposed directly created ambiguity. The model would try <code>get_server_health</code> for a query that should have gone through the router to <code>get_database_status</code>.</p>
+
+<div class="pullquote">
+  <p>"Hybrid is not a middle ground — it is two interfaces competing for the model's attention. Design it carefully or don't use it."</p>
+</div>
+
+<p>If you do want hybrid, keep the direct set minimal and semantically distinct. A safe combination:</p>
+<pre><span class="cm"># Good hybrid direct set — few, distinct, high-confidence</span>
+get_ticket_status
+get_order_status
+tool_router      <span class="cm"># everything else</span>
+
+<span class="cm"># Dangerous hybrid direct set — broad, overlapping</span>
+get_server_health
+get_recent_logs
+get_vector_search_results
+get_customer_details</pre>
+
+<div class="divider">· · ·</div>
+
+<h2>Why This Becomes More Important As You Scale</h2>
+
+<p>In a real company, APIs change. New endpoints are added. Parameters evolve. Teams rename things. Services are deprecated and replaced. If every tool is directly exposed to the model, every one of those changes is a model-interface change — something that can alter agent behaviour in unexpected ways.</p>
+
+<p>With a routing layer, the model-facing interface is frozen:</p>
+
+<pre>tool_router(query, context)</pre>
+
+<p>Your backend is free to evolve as fast as your engineering teams move. The router becomes the boundary between your AI agent and your internal systems — a boundary that protects both sides.</p>
+
+<p>This is especially powerful for the external API aggregator scenario. Stripe updates their payment API. FedEx adds a new tracking status. Your shipping carrier changes their authentication scheme. None of that touches the model. It is entirely an internal change to your router.</p>
+
+<!-- RECOMMENDATION BOX -->
+<div class="rec-box">
+  <h2 style="font-family:var(--serif);font-size:26px;letter-spacing:-0.02em;margin-bottom:8px">When to use each architecture</h2>
+  <p>There is no single right answer — but there is a clear decision tree based on your current scale and priorities.</p>
+  <div class="rec-grid">
+    <div class="rec-card featured">
+      <div class="mode">router</div>
+      <div class="use-label">Production default</div>
+      <div class="mode-desc">Best token efficiency and lowest latency at scale. Stable model interface. Use when your tool catalog exceeds ~30 tools or may grow.</div>
+    </div>
+    <div class="rec-card">
+      <div class="mode" style="color:#93c5fd">two-step</div>
+      <div class="use-label">Debug & trace mode</div>
+      <div class="mode-desc">Full observability of selection and execution. Pair with a visual trace UI. Use alongside router in development environments.</div>
+    </div>
+    <div class="rec-card">
+      <div class="mode" style="color:#fbbf24">direct</div>
+      <div class="use-label">Small catalogs & prototypes</div>
+      <div class="mode-desc">Simple, transparent, zero infrastructure overhead. Use for catalogs under 30 tools that won't grow significantly.</div>
+    </div>
+    <div class="rec-card">
+      <div class="mode" style="color:#f87171">hybrid</div>
+      <div class="use-label">Experimental only</div>
+      <div class="mode-desc">Only after carefully selecting a minimal, highly distinct set of direct tools. Avoid broad general-purpose tools in the direct set.</div>
+    </div>
+  </div>
+</div>
+
+<h2>The Pattern That Scales</h2>
+
+<p>If you are building an AI agent today that connects to more than a handful of internal or external APIs, here is the production pattern that the benchmark validates:</p>
+
+<pre><span class="cm"># Production: one clean interface for the model</span>
+tool_router(query, context)
+
+<span class="cm"># Development: two explicit steps for tracing</span>
+discover_tool(query, context)
+  <span class="kw">→</span> { selected_tool, params, confidence, reason }
+execute_tool(selected_tool, params)
+  <span class="kw">→</span> result</pre>
+
+<p>Run router in production. Run two-step in your development and staging environments where you need to understand what the agent is deciding and why. As your system grows — more services, more integrations, more teams contributing tools — neither the model nor your users will notice. The router absorbs the complexity so the agent does not have to.</p>
+
+<p>The benchmark at 100 tools makes the case plainly: routing is both cheaper and faster than direct exposure, with no sacrifice in accuracy. The investment in a routing layer pays off before you hit 50 tools, and keeps paying as your catalog grows.</p>
+
+</div>
+
+<!-- FOOTER -->
+<div class="article-footer">
+  <p>Benchmark methodology: 20 queries per architecture, three catalog sizes (20 / 60 / 100 tools), Claude Sonnet 4 on Amazon Bedrock via custom MCP servers. Extra tools in 60 and 100-tool runs are distractors to test routing quality under catalog pressure. Router architecture excluded from head-to-head execution tables — it was designed to test tool-finding, not full execution pipelines. All results are averages across complete 20-query runs.</p>
+</div>
+
+<script>
+const sizes=['20 tools','60 tools','100 tools'];
+const gridC='rgba(0,0,0,0.05)';
+const tickC='#999';
+const baseOpts={
+  responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:false}},
+  scales:{
+    x:{ticks:{color:tickC,font:{size:11,family:'Fira Code'}},grid:{color:gridC}},
+    y:{ticks:{color:tickC,font:{size:11,family:'Fira Code'}},grid:{color:gridC}}
+  }
+};
+
+new Chart(document.getElementById('tokChart'),{
+  type:'bar',
+  data:{
+    labels:sizes,
+    datasets:[
+      {label:'direct',  data:[163,166,186],backgroundColor:'rgba(26,82,118,0.15)',borderColor:'#1a5276',borderWidth:1.5,borderRadius:5},
+      {label:'two-step',data:[147,151,146],backgroundColor:'rgba(13,115,119,0.15)',borderColor:'#0d7377',borderWidth:1.5,borderRadius:5},
+      {label:'hybrid',  data:[288,272,259],backgroundColor:'rgba(192,57,43,0.12)',borderColor:'#c0392b',borderWidth:1.5,borderRadius:5},
+    ]
+  },
+  options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,suggestedMax:340}}}
+});
+
+new Chart(document.getElementById('latChart'),{
+  type:'line',
+  data:{
+    labels:sizes,
+    datasets:[
+      {label:'direct',  data:[3820,3950,4870],borderColor:'#1a5276',backgroundColor:'rgba(26,82,118,0.05)',fill:true,tension:0.4,pointRadius:4,borderWidth:2},
+      {label:'two-step',data:[3764,4010,4640],borderColor:'#0d7377',backgroundColor:'rgba(13,115,119,0.05)',fill:true,tension:0.4,pointRadius:4,borderWidth:2},
+      {label:'hybrid',  data:[5660,5730,6130],borderColor:'#c0392b',backgroundColor:'rgba(192,57,43,0.04)',fill:true,tension:0.4,pointRadius:4,borderWidth:2,borderDash:[6,3]},
+    ]
+  },
+  options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,ticks:{...baseOpts.scales.y.ticks,callback:v=>(v/1000).toFixed(1)+'s'}}}}
+});
+
+new Chart(document.getElementById('sucChart'),{
+  type:'bar',
+  data:{
+    labels:sizes,
+    datasets:[
+      {label:'direct',  data:[100,100,100],backgroundColor:'rgba(26,82,118,0.15)',borderColor:'#1a5276',borderWidth:1.5,borderRadius:4},
+      {label:'two-step',data:[100,100,100],backgroundColor:'rgba(13,115,119,0.15)',borderColor:'#0d7377',borderWidth:1.5,borderRadius:4},
+      {label:'hybrid',  data:[25,70,90],   backgroundColor:'rgba(192,57,43,0.12)',borderColor:'#c0392b',borderWidth:1.5,borderRadius:4},
+    ]
+  },
+  options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,min:0,max:110,ticks:{...baseOpts.scales.y.ticks,callback:v=>v+'%'}}}}
+});
+</script>
+</body>
+</html>

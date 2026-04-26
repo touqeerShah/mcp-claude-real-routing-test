@@ -1,0 +1,13 @@
+node_modules/
+dist/
+runs/*
+!runs/.gitkeep
+output/
+.DS_Store
+node_modules
+dist
+.claude
+**runs/*
+tools-20-doc/runs
+tools-60-doc/runs
+tools-100-doc/runs
